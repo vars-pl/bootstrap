@@ -117,7 +117,7 @@ class Dropdown {
 
     const isActive = $(this._menu).hasClass(CLASS_NAME_SHOW)
 
-    Dropdown._clearMenus()
+    Dropdown._clearMenus(null, this)
 
     if (isActive) {
       return
@@ -369,11 +369,17 @@ class Dropdown {
     })
   }
 
-  static _clearMenus(event) {
+  static _clearMenus(event, source) {
     if (event && (event.which === RIGHT_MOUSE_BUTTON_WHICH ||
       event.type === 'keyup' && event.which !== TAB_KEYCODE)) {
       return
     }
+
+    var sourceParrent = null;
+
+      if (source) {
+        sourceParrent = Dropdown._getParentFromElement(source._element);
+      }
 
     const toggles = [].slice.call(document.querySelectorAll(SELECTOR_DATA_TOGGLE))
 
@@ -395,6 +401,10 @@ class Dropdown {
       const dropdownMenu = context._menu
       if (!$(parent).hasClass(CLASS_NAME_SHOW)) {
         continue
+      }
+
+      if (source && sourceParrent && $(parent).has($(sourceParrent)).length) {
+        continue;
       }
 
       if (event && (event.type === 'click' &&

@@ -51,7 +51,17 @@
   function _inheritsLoose(subClass, superClass) {
     subClass.prototype = Object.create(superClass.prototype);
     subClass.prototype.constructor = subClass;
-    subClass.__proto__ = superClass;
+
+    _setPrototypeOf(subClass, superClass);
+  }
+
+  function _setPrototypeOf(o, p) {
+    _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
+      o.__proto__ = p;
+      return o;
+    };
+
+    return _setPrototypeOf(o, p);
   }
 
   /**
@@ -1626,7 +1636,7 @@
 
       var isActive = $__default['default'](this._menu).hasClass(CLASS_NAME_SHOW$2);
 
-      Dropdown._clearMenus();
+      Dropdown._clearMenus(null, this);
 
       if (isActive) {
         return;
@@ -1865,9 +1875,15 @@
       });
     };
 
-    Dropdown._clearMenus = function _clearMenus(event) {
+    Dropdown._clearMenus = function _clearMenus(event, source) {
       if (event && (event.which === RIGHT_MOUSE_BUTTON_WHICH || event.type === 'keyup' && event.which !== TAB_KEYCODE)) {
         return;
+      }
+
+      var sourceParrent = null;
+
+      if (source) {
+        sourceParrent = Dropdown._getParentFromElement(source._element);
       }
 
       var toggles = [].slice.call(document.querySelectorAll(SELECTOR_DATA_TOGGLE$2));
@@ -1891,6 +1907,10 @@
         var dropdownMenu = context._menu;
 
         if (!$__default['default'](parent).hasClass(CLASS_NAME_SHOW$2)) {
+          continue;
+        }
+
+        if (source && sourceParrent && $__default['default'](parent).has($__default['default'](sourceParrent)).length) {
           continue;
         }
 
@@ -3624,8 +3644,8 @@
 
     _createClass(Popover, null, [{
       key: "VERSION",
-      // Getters
-      get: function get() {
+      get: // Getters
+      function get() {
         return VERSION$7;
       }
     }, {

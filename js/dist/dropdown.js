@@ -144,7 +144,7 @@
 
       var isActive = $__default['default'](this._menu).hasClass(CLASS_NAME_SHOW);
 
-      Dropdown._clearMenus();
+      Dropdown._clearMenus(null, this);
 
       if (isActive) {
         return;
@@ -383,9 +383,15 @@
       });
     };
 
-    Dropdown._clearMenus = function _clearMenus(event) {
+    Dropdown._clearMenus = function _clearMenus(event, source) {
       if (event && (event.which === RIGHT_MOUSE_BUTTON_WHICH || event.type === 'keyup' && event.which !== TAB_KEYCODE)) {
         return;
+      }
+
+      var sourceParrent = null;
+
+      if (source) {
+        sourceParrent = Dropdown._getParentFromElement(source._element);
       }
 
       var toggles = [].slice.call(document.querySelectorAll(SELECTOR_DATA_TOGGLE));
@@ -409,6 +415,10 @@
         var dropdownMenu = context._menu;
 
         if (!$__default['default'](parent).hasClass(CLASS_NAME_SHOW)) {
+          continue;
+        }
+
+        if (source && sourceParrent && $__default['default'](parent).has($__default['default'](sourceParrent)).length) {
           continue;
         }
 
